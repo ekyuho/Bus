@@ -4,7 +4,7 @@ app = Flask(__name__)
 import requests
 import xml.etree.ElementTree as ET 
 
-#key = "KZVJVTS6otUHW1f%2FLlV4d7vi2qrqIeRkLYP0q6tK4TO0vkGh%2FA6scK2EYD8YfDV%2B1LPk86QhLIAuvW0JdNAF4A%3D%3D"
+#key = "KZVJVTS6otUHW1f%2FLlV4d7.........8YfDV%2B1LPk86QhLIAuvW0JdNAF4A%3D%3D" # put your own API Key
 key = "1234567890"
 path = "http://openapi.gbis.go.kr/ws/rest/buslocationservice"
 routeid = '234000002'
