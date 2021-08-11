@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <script type="text/javascript">
+var myVar = setInterval(myTimer, 1000);
+var myVar2 = setTimeout(myTimer2, 100);
+<%CONTINUE%>
+var tick = 0
+
+function myTimer() {
+  tick++;
+  document.getElementById("demo").innerHTML = tick.toString() + ' 초 <%STOP%>';
+}
+
+function myTimer2() {
+  var d = new Date();
+  document.getElementById("demo1").innerHTML = d.toLocaleTimeString()
+}
+
+function reload() {
+  window.location.href = "/?count=<%COUNT%>";
+}
+  </script>
+</head>
+<body style="font-size:50px">
+<H2>9000번 버스 추적기</H2>
+<div id='demo1' style="float:left"> </div> 
+<div id="demo2" style="float:left"> &nbsp;+ </div>
+<div id='demo' style="float:left"> 초 </div>
+<div id='demo3'> </div>
+</font>
+<p>
+<%DATA%>
+</body>
+</html>
