@@ -1,10 +1,11 @@
+#!/usr/bin/python3
 from flask import Flask, request
 app = Flask(__name__)
 
 import requests
-import xml.etree.ElementTree as ET 
+import xml.etree.ElementTree as ET
 
-#key = "KZVJVTS6otUHW1f%2FLlV4d7.........8YfDV%2B1LPk86QhLIAuvW0JdNAF4A%3D%3D" # put your own API Key
+#key = "ol%2FUi4PE7GDF0CL7hPUHGTnrWFLwr6XLnzWE4LbvwhwmypQcVver%2BmF6upXUy2z%2BZ34U7OTRU1zPSx3vDUK3mw%3D%3D"
 key = "1234567890"
 path = "http://openapi.gbis.go.kr/ws/rest/buslocationservice"
 routeid = '234000002'
@@ -26,7 +27,7 @@ with open("routestation20190902.csv", encoding='euckr') as f:
 
 for x in line:
     d = x.replace('\n','').split(',')
-    if d[0] == routeid: 
+    if d[0] == routeid:
         route[d[3]] = {"stationid":d[1],"name":d[5]}
         #if int(d[3]) < 14: print(d[3], route[d[3]])
 
@@ -67,7 +68,7 @@ def bus():
         for i in range(begin,len(route)):
             no = str(i)
             mark = " "
-            if no in bus: 
+            if no in bus:
                 mark = "<b>BUS *"
                 found += 1
             else: mark = "</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -83,13 +84,14 @@ def bus():
         with open("page.html") as f: page = f.read()
         retstr = page.replace('<%DATA%>', ret)
         retstr = retstr.replace('<%COUNT%>', str(count))
-        if count < 20: 
+        if count < 20:
             retstr = retstr.replace('<%CONTINUE%>', 'var myVar3 = setTimeout(reload, 60000);');
             retstr = retstr.replace('<%STOP%>', '');
-        else: 
+        else:
             retstr = retstr.replace('<%CONTINUE%>', '');
             retstr = retstr.replace('<%STOP%>', '<font color=red><b>***** STOPPED *****</b></font>');
         return retstr, {'Content-Type': 'text/html; charset=utf8'}
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5500)
+          
