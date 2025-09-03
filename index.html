@@ -12,7 +12,7 @@
     const brokerUrl = 'wss://damoa.io:9002';
 
     // 고유한 클라이언트 ID 생성 (다른 사용자와 충돌 방지)
-    const clientId = 'mqtt-browser-client-' + Math.random().toString(16).substr(2, 8);
+    const clientId = 'bus-client-' + Math.random().toString(16).substr(2, 8);
     
     // 별도 인증이 필요 없으므로 options 객체는 간단하게 clientId만 포함
     const options = {
