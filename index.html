@@ -57,7 +57,7 @@
         `;
 
         // 3. 기존 내용 뒤에 새로운 HTML을 추가합니다. (+= 연산자 사용)
-        mainDiv.innerHTML += messageHTML;
+        mainDiv.innerHTML = messageHTML;
         
         // 스크롤을 항상 아래로 이동시켜 최신 메시지를 보여줍니다.
         mainDiv.scrollTop = mainDiv.scrollHeight;
