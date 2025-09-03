@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-from flask import Flask, request
-app = Flask(__name__)
-
+from paho.mqtt import client as mqtt
+import json
 import requests
 import xml.etree.ElementTree as ET
 
+#key = "ol%2FUi4PE7GDF0CL7hPUHGTnrWFLwr6XLnzWE4LbvwhwmypQcVver%2BmF6upXUy2z%2BZ34U7OTRU1zPSx3vDUK3mw%3D%3D"
 key = "1234567890"
 path = "http://openapi.gbis.go.kr/ws/rest/buslocationservice"
 routeid = '234000002'
@@ -30,26 +30,21 @@ for x in line:
         route[d[3]] = {"stationid":d[1],"name":d[5]}
         #if int(d[3]) < 14: print(d[3], route[d[3]])
 
-@app.errorhandler(404)
-def nopage(e):
-    return  request.remote_addr, {'Content-Type': 'text/html; charset=utf8'}
-
-
-@app.route("/")
-def bus():
-    print('got /', flush=True)
-    count = request.args.get('count', '')
+def bus(j):
+    #print('got /', flush=True)
+    count = j.get('count', '')
     if count == "": count = 1
     else: count = int(count) + 1
 
-    line = request.args.get('line', '')
+    line = j.get('line', '')
     if line == "": line = 15
     else: line = int(line)
 
-    begin = request.args.get('begin', '')
+    begin = j.get('begin', '')
     if begin == "": begin = 1
     else: begin = int(begin)
 
+    #print(url)
     r = requests.get(url)
     root = ET.fromstring(r.text)
     bus = {}
@@ -59,8 +54,8 @@ def bus():
 
     if len(bus) == 0:
         ret = '<body style="font-size:110%">'
-        ret += "일시적 에러입니다<p>"+r.text
-        return ret, {'Content-Type': 'text/html; charset=utf8'}
+        ret += "버스운행정보가 없습니다"
+        return ret
     else:
         found = 0
         more = 0
@@ -76,12 +71,13 @@ def bus():
             elif i == 7:
                 ret += "<br><font color=red>%s %d %s</font>"%(mark, i, route[no]["name"])
             else:
-                ret += "<br>%s %d %s"%(mark, i, route[no]["name"])
+                ret += "\n<br>%s %d %s"%(mark, i, route[no]["name"])
             if more > 1 and found > 1 and i > 15: break
             if found > 1: more += 1
 
-        with open("page.html") as f: page = f.read()
-        retstr = page.replace('<%DATA%>', ret)
+        #with open("page.html") as f: page = f.read()
+        #retstr = page.replace('<%DATA%>', ret)
+        '''
         retstr = retstr.replace('<%COUNT%>', str(count))
         if count < 20:
             retstr = retstr.replace('<%CONTINUE%>', 'var myVar3 = setTimeout(reload, 60000);');
@@ -89,8 +85,31 @@ def bus():
         else:
             retstr = retstr.replace('<%CONTINUE%>', '');
             retstr = retstr.replace('<%STOP%>', '<font color=red><b>***** STOPPED *****</b></font>');
-        return retstr, {'Content-Type': 'text/html; charset=utf8'}
+        '''
+        return ret
+        
+def on_message(client, userdata, msg):
+    print(msg.topic)
+    payload=msg.payload.decode("utf8").strip()
+    
+    if payload: j=json.loads(payload)
+    else: j={}
+    print(f'/{payload}/', type(payload))
+    r=str(bus(j))
+    print(r)
+    mqttc.publish("ek/bus/answer", r, qos=1)
+    
+        
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code.is_failure:
+        print(f"Failed to connect: {reason_code}. loop_forever() will retry connection")
+    else:
+        # we should always subscribe from on_connect callback to be sure
+        # our subscribed is persisted across reconnections.
+        client.subscribe("ek/bus/ask")
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5500)
-          
+mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+mqttc.on_connect = on_connect
+mqttc.on_message = on_message
+mqttc.connect("damoa.io")
+mqttc.loop_forever()
