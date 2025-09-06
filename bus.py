@@ -51,26 +51,28 @@ def bus(j):
     for child in root.findall('msgBody/busLocationList'):
         bus[child.find('stationSeq').text] = {"seat":child.find('remainSeatCnt').text, "stationid":child.find('stationId').text}
 
+    ret = '<B>9000번 추적기</B>'
+    ret += '<body style="font-size:110%">'
     if len(bus) == 0:
-        ret = '<body style="font-size:110%">'
         ret += "버스운행정보가 없습니다"
-        return ret
     else:
         found = 0
         more = 0
         for i in range(begin,len(route)):
             no = str(i)
-            mark = " "
+            mark = ""
+            mark2= ""
             if no in bus:
                 mark = "<b>BUS *"
+                mark2="</b>"
                 found += 1
-            else: mark = "</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            else: mark = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             if i == 13:
                 ret += "<br><font color=blue>%s %d %s</font>"%(mark, i, route[no]["name"])
             elif i == 7:
                 ret += "<br><font color=red>%s %d %s</font>"%(mark, i, route[no]["name"])
             else:
-                ret += "\n<br>%s %d %s"%(mark, i, route[no]["name"])
+                ret += "\n<br>%s %d %s %s"%(mark, i, route[no]["name"], mark2)
             if more > 1 and found > 1 and i > 15: break
             if found > 1: more += 1
 
@@ -85,7 +87,7 @@ def bus(j):
             retstr = retstr.replace('<%CONTINUE%>', '');
             retstr = retstr.replace('<%STOP%>', '<font color=red><b>***** STOPPED *****</b></font>');
         '''
-        return ret
+    return ret
         
 def on_message(client, userdata, msg):
     print(msg.topic)
@@ -93,7 +95,7 @@ def on_message(client, userdata, msg):
     
     if payload: j=json.loads(payload)
     else: j={}
-    print(f'/{payload}/', type(payload))
+    #print(f'/{payload}/', type(payload))
     r=str(bus(j))
     print(r)
     mqttc.publish("ek/bus/answer", r, qos=1)
