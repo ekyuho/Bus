@@ -5,7 +5,7 @@
     <title>Bus</title>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 	<script>
-	    const brokerUrl = 'ws://damoa.io:9002';
+	    const brokerUrl = 'wss://damoa.io:9002';
 	
 	    // 고유한 클라이언트 ID 생성 (다른 사용자와 충돌 방지)
 	    const clientId = 'bus-client-' + Math.random().toString(16).substr(2, 8);
